@@ -148,11 +148,11 @@ contract IncentiveLayer is JackpotManager, DepositsManager {
 		return true;
 	}
 
-		/// @dev solver registers for tasks, if first to register than automatically selected solver
+	/// @dev solver registers for tasks, if first to register than automatically selected solver
 	//  0 -> 1
-		/// @param taskID The task id.
-		/// @param randomBitsHash Hash of random bits to commit to task
-		/// @return – boolean
+	/// @param taskID The task id.
+	/// @param randomBitsHash Hash of random bits to commit to task
+	/// @return – boolean
 	function registerForTask(uint taskID, bytes32 randomBitsHash) public returns(bool) {
 		Task storage t = tasks[taskID];
 		
@@ -172,10 +172,10 @@ contract IncentiveLayer is JackpotManager, DepositsManager {
 
 	/// @dev Selected solver submits a solution to the exchange
 	// 1->2
-		/// @param taskID The task id.
-		/// @param solutionHash0 The hash of the solution (could be true or false solution)
-		/// @param solutionHash1 The hash of the solution (could be true or false solution)
-		/// @return boolean
+	/// @param taskID The task id.
+	/// @param solutionHash0 The hash of the solution (could be true or false solution)
+	/// @param solutionHash1 The hash of the solution (could be true or false solution)
+	/// @return boolean
 	function commitSolution(uint taskID, bytes32 solutionHash0, bytes32 solutionHash1) public returns (bool) {
 		Task storage t = tasks[taskID];
 		require(t.selectedSolver == msg.sender);
@@ -200,11 +200,11 @@ contract IncentiveLayer is JackpotManager, DepositsManager {
 		t.state = State.TaskTimeout;
 	}
 
-		/// @dev Verifier submits a challenge to the solution provided for a task
+	/// @dev Verifier submits a challenge to the solution provided for a task
 	// verifiers can call this until task giver changes state or timeout
-		/// @param taskID The task id.
-		/// @param intentHash Submit hash of even or odd number to designate which solution is correct/incorrect.
-		/// @return – boolean
+	/// @param taskID The task id.
+	/// @param intentHash Submit hash of even or odd number to designate which solution is correct/incorrect.
+	/// @return – boolean
 	function commitChallenge(uint taskID, bytes32 intentHash) public returns (bool) {
 		Task storage t = tasks[taskID];
 		require(t.state == State.SolutionComitted);
@@ -214,10 +214,10 @@ contract IncentiveLayer is JackpotManager, DepositsManager {
 		return true;
 	}
 
-		/// @dev Verifiers can call this until task giver changes state or timeout
-		/// @param taskID The task id.
-		/// @param intent Submit 0 to challenge solution0, 1 to challenge solution1, anything else challenges both
-		/// @return boolean
+	/// @dev Verifiers can call this until task giver changes state or timeout
+	/// @param taskID The task id.
+	/// @param intent Submit 0 to challenge solution0, 1 to challenge solution1, anything else challenges both
+	/// @return boolean
 	function revealIntent(uint taskID, uint intent) public returns (bool) {
 		require(tasks[taskID].challenges[msg.sender] == keccak256(intent));
 		require(tasks[taskID].state == State.ChallengesAccepted);
@@ -236,12 +236,12 @@ contract IncentiveLayer is JackpotManager, DepositsManager {
 		return true;
 	}
 
-		/// @dev Solver reveals which solution they say is the correct one
-		// 4->5
-		/// @param taskID The task id.
-		/// @param solution0Correct Determines if solution0Hash is the correct solution
-		/// @param originalRandomBits Original random bits for sake of commitment.
-		/// @return boolean
+	/// @dev Solver reveals which solution they say is the correct one
+	// 4->5
+	/// @param taskID The task id.
+	/// @param solution0Correct Determines if solution0Hash is the correct solution
+	/// @param originalRandomBits Original random bits for sake of commitment.
+	/// @return boolean
 	function revealSolution(uint taskID, bool solution0Correct, uint originalRandomBits) public {
 		Task storage t = tasks[taskID];
 		require(t.randomBitsHash == keccak256(originalRandomBits));
