@@ -54,20 +54,19 @@ contract IncentiveLayer is JackpotManager, DepositsManager {
 
 	uint8[8] private timeoutWeights = [1, 20, 30, 35, 40, 45, 50, 55];//one timeout per state in the FSM
 
-	// @dev - private method to check if the denoted amount of blocks have been mined (time has passed).
-	// @param taskID - the task id.
-	// @param numBlocks - the difficulty weight for the task
-	// @return - boolean
+	/// @dev Private method to check if the denoted amount of blocks have been mined (time has passed).
+	/// @param taskID The task id.
+	/// @return boolean
 	function stateChangeTimeoutReached(uint taskID) private view returns (bool) {
 		Task storage t = tasks[taskID];
 		return block.number.sub(t.taskCreationBlockNumber) >= timeoutWeights[uint(t.state)-1];
 	}
 
-	// @dev – locks up part of the a user's deposit into a task.
-	// @param taskID – the task id.
-	// @param account – the user's address.
-	// @param amount – the amount of deposit to lock up. 
-	// @return – the user's deposit bonded for the task.
+	/// @dev Locks up part of the a user's deposit into a task.
+	/// @param taskID The task id.
+	/// @param account The user's address.
+	/// @param amount The amount of deposit to lock up. 
+	/// @return The user's deposit bonded for the task.
 	function bondDeposit(uint taskID, address account, uint amount) private returns (uint) { 
 	  Task storage task = tasks[taskID];
 	  require(deposits[msg.sender] >= amount);
@@ -77,10 +76,9 @@ contract IncentiveLayer is JackpotManager, DepositsManager {
 	  return task.bondedDeposits[account];
 	}
 
-	// @dev – unlocks a user's bonded deposits from a task.
-	// @param taskID – the task id.
-	// @param account – the user's address.
-	// @return – the user's deposit which was unbonded from the task.
+	/// @dev Unlocks a user's bonded deposits from a task.
+	/// @param taskID The task id.
+	/// @return The user's deposit which was unbonded from the task.
 	function unbondDeposit(uint taskID) public returns (uint) {
 	  Task storage task = tasks[taskID];
 	  require(task.state == State.TaskFinalized || task.state == State.TaskTimeout);
@@ -92,10 +90,10 @@ contract IncentiveLayer is JackpotManager, DepositsManager {
 	  return bondedDeposit;
 	}
 
-	// @dev – punishes a user by moving their bonded deposits for a task into the jackpot.
-	// @param taskID – the task id.
-	// @param account – the user's address.
-	// @return – the updated jackpot amount.
+	/// @dev Punishes a user by moving their bonded deposits for a task into the jackpot.
+	/// @param taskID The task id.
+	/// @param account The user's address.
+	/// @return The updated jackpot amount.
 	function moveBondedDepositToJackpot(uint taskID, address account) private returns (uint) { 
 	  Task storage task = tasks[taskID];
 	  uint bondedDeposit = task.bondedDeposits[account];
@@ -106,20 +104,19 @@ contract IncentiveLayer is JackpotManager, DepositsManager {
 	  return bondedDeposit;
 	}
 
-	// @dev – returns the user's bonded deposits for a task.
-	// @param taskID – the task id.
-	// @param account – the user's address.
-	// @return – the user's bonded deposits for a task.
+	/// @dev returns The user's bonded deposits for a task.
+	/// @param taskID The task id.
+	/// @param account The user's address.
+	/// @return The user's bonded deposits for a task.
 	function getBondedDeposit(uint taskID, address account) constant public returns (uint) {
 	  return tasks[taskID].bondedDeposits[account];
 	}
 
-	// @dev – taskGiver creates tasks to be solved.
-  	// @param minDeposit – the minimum deposit required for engaging with a task as a solver or verifier.
-  	// @param reward - the payout given to solver
-  	// @param taskData – tbd. could be hash of the wasm file on a filesystem.
-  	// @param numBlocks – the number of blocks to adjust for task difficulty
-  	// @return – boolean
+	/// @dev taskGiver creates tasks to be solved.
+	/// @param minDeposit The minimum deposit required for engaging with a task as a solver or verifier.
+	/// @param taskData Tbd could be hash of the wasm file on a filesystem.
+	/// @param numBlocks The number of blocks to adjust for task difficulty.
+	/// @return – boolean
 	function createTask(uint minDeposit, bytes32 taskData, uint numBlocks) public payable returns (bool) {
 		require(deposits[msg.sender] >= minDeposit);
 		require(msg.value > 0);
@@ -138,10 +135,10 @@ contract IncentiveLayer is JackpotManager, DepositsManager {
 		return true;
 	}
 
-  	// @dev – changes a tasks state.
-  	// @param taskID – the task id.
-  	// @param newSate – the new state.
-  	// @return – boolean
+		/// @dev changes A tasks state.
+		/// @param taskID The task id.
+		/// @param newState The new state.
+		/// @return boolean
 	function changeTaskState(uint taskID, uint newState) public returns (bool) {
 		Task storage t = tasks[taskID];
 		require(t.owner == msg.sender);
@@ -151,11 +148,11 @@ contract IncentiveLayer is JackpotManager, DepositsManager {
 		return true;
 	}
 
-	// @dev – solver registers for tasks, if first to register than automatically selected solver
+		/// @dev solver registers for tasks, if first to register than automatically selected solver
 	//  0 -> 1
-  	// @param taskID – the task id.
-  	// @param randomBitsHash – hash of random bits to commit to task
-  	// @return – boolean
+		/// @param taskID The task id.
+		/// @param randomBitsHash Hash of random bits to commit to task
+		/// @return – boolean
 	function registerForTask(uint taskID, bytes32 randomBitsHash) public returns(bool) {
 		Task storage t = tasks[taskID];
 		
@@ -173,12 +170,12 @@ contract IncentiveLayer is JackpotManager, DepositsManager {
     return true;
 	}
 
-	// @dev – selected solver submits a solution to the exchange
+	/// @dev Selected solver submits a solution to the exchange
 	// 1->2
-  	// @param taskID – the task id.
- 	// @param solutionHash0 – the hash of the solution (could be true or false solution)
-  	// @param solutionHash1 – the hash of the solution (could be true or false solution)
-  	// @return – boolean
+		/// @param taskID The task id.
+		/// @param solutionHash0 The hash of the solution (could be true or false solution)
+		/// @param solutionHash1 The hash of the solution (could be true or false solution)
+		/// @return boolean
 	function commitSolution(uint taskID, bytes32 solutionHash0, bytes32 solutionHash1) public returns (bool) {
 		Task storage t = tasks[taskID];
 		require(t.selectedSolver == msg.sender);
@@ -203,11 +200,11 @@ contract IncentiveLayer is JackpotManager, DepositsManager {
 		t.state = State.TaskTimeout;
 	}
 
-	// @dev – verifier submits a challenge to the solution provided for a task
+		/// @dev Verifier submits a challenge to the solution provided for a task
 	// verifiers can call this until task giver changes state or timeout
-  	// @param taskID – the task id.
-  	// @param intentHash – submit hash of even or odd number to designate which solution is correct/incorrect.
-  	// @return – boolean
+		/// @param taskID The task id.
+		/// @param intentHash Submit hash of even or odd number to designate which solution is correct/incorrect.
+		/// @return – boolean
 	function commitChallenge(uint taskID, bytes32 intentHash) public returns (bool) {
 		Task storage t = tasks[taskID];
 		require(t.state == State.SolutionComitted);
@@ -217,10 +214,10 @@ contract IncentiveLayer is JackpotManager, DepositsManager {
 		return true;
 	}
 
-	// @dev – verifiers can call this until task giver changes state or timeout
-  	// @param taskID – the task id.
-  	// @param intent – submit 0 to challenge solution0, 1 to challenge solution1, anything else challenges both
-  	// @return – boolean
+		/// @dev Verifiers can call this until task giver changes state or timeout
+		/// @param taskID The task id.
+		/// @param intent Submit 0 to challenge solution0, 1 to challenge solution1, anything else challenges both
+		/// @return boolean
 	function revealIntent(uint taskID, uint intent) public returns (bool) {
 		require(tasks[taskID].challenges[msg.sender] == keccak256(intent));
 		require(tasks[taskID].state == State.ChallengesAccepted);
@@ -239,12 +236,12 @@ contract IncentiveLayer is JackpotManager, DepositsManager {
 		return true;
 	}
 
-	// @dev – solver reveals which solution they say is the correct one
-  	// 4->5
-  	// @param taskID – the task id.
-  	// @param solution0Correct – determines if solution0Hash is the correct solution
-  	// @param originalRandomBits – original random bits for sake of commitment.
-  	// @return – boolean
+		/// @dev Solver reveals which solution they say is the correct one
+		// 4->5
+		/// @param taskID The task id.
+		/// @param solution0Correct Determines if solution0Hash is the correct solution
+		/// @param originalRandomBits Original random bits for sake of commitment.
+		/// @return boolean
 	function revealSolution(uint taskID, bool solution0Correct, uint originalRandomBits) public {
 		Task storage t = tasks[taskID];
 		require(t.randomBitsHash == keccak256(originalRandomBits));
