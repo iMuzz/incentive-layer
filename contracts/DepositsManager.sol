@@ -13,34 +13,34 @@ contract DepositsManager {
   event DepositWithdrawn(address who, uint amount);
   event JackpotIncreased(uint amount);
 
-  // @dev – the constructor
+  /// @dev The constructor
   function DepositsManager() public {
     owner = msg.sender;
   }
   
-  // @dev – fallback to calling makeDeposit when ether is sent directly to contract.
+  /// @dev fallback to calling makeDeposit when ether is sent directly to contract.
   function() public payable {
     makeDeposit();
   }
 
-  // @dev – returns an account's deposit
-  // @param who – the account's address.
-  // @return – the account's deposit.
+  /// @dev Returns an account's deposit
+  /// @param who The account's address.
+  /// @return The account's deposit.
   function getDeposit(address who) constant public returns (uint) {
     return deposits[who];
   }
 
-  // @dev – allows a user to deposit eth.
-  // @return – the user's updated deposit amount.
+  /// @dev Allows a user to deposit eth.
+  /// @return The user's updated deposit amount.
   function makeDeposit() public payable returns (uint) {
     deposits[msg.sender] = deposits[msg.sender].add(msg.value);
     DepositMade(msg.sender, msg.value);
     return deposits[msg.sender];
   }
 
-  // @dev – allows a user to withdraw eth from their deposit.
-  // @param amount – how much eth to withdraw
-  // @return – the user's updated deposit amount.
+  /// @dev Allows a user to withdraw eth from their deposit.
+  /// @param amount How much eth to withdraw
+  /// @return The user's updated deposit amount.
   function withdrawDeposit(uint amount) public returns (uint) {
     require(deposits[msg.sender] > amount);
 
